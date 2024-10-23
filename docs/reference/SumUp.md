@@ -112,6 +112,14 @@ public function getPayoutService(\SumUp\Application\ApplicationConfigurationInte
 
 Returns an instance of `\SumUp\Services\Payouts`.
 
+### getReadersService()
+
+```php
+public function getReadersService(\SumUp\Application\ApplicationConfigurationInterface $config = null): \SumUp\Services\Readers
+```
+
+Returns an instance of `\SumUp\Services\Readers`.
+
 ### getCustomService()
 
 ```php

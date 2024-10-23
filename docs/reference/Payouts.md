@@ -38,7 +38,7 @@ public function getTransactions(
     string $startDate,
     string $endDate,
     int    $limit = 10,
-    boo    $descendingOrder = true,
+    bool    $descendingOrder = true,
     string $format = 'json'
 ): \SumUp\HttpClients\Response
 ```

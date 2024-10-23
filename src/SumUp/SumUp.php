@@ -16,6 +16,7 @@ use SumUp\Services\Merchant;
 use SumUp\Services\Transactions;
 use SumUp\Services\Payouts;
 use SumUp\Services\Custom;
+use SumUp\Services\Readers;
 
 /**
  * Class SumUp
@@ -190,6 +191,22 @@ class SumUp
             $accToken = $this->accessToken;
         }
         return new Payouts($this->client, $accToken);
+    }
+
+    /**
+     * Get the service for readers.
+     *
+     * @param AccessToken|null $accessToken
+     *
+     * @return Readers
+     */
+    public function getReadersService(AccessToken $accessToken = null) {
+        if (!empty($accessToken)) {
+            $accToken = $accessToken;
+        } else {
+            $accToken = $this->accessToken;
+        }
+        return new Readers($this->client, $accToken);
     }
 
     /**
