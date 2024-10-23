@@ -21,6 +21,7 @@ Here is the API reference for the SumUp Ecommerce SDK for PHP.
 | [\SumUp\Services\Customers](https://github.com/sumup/sumup-ecom-php-sdk/blob/master/docs/reference/Customers.md) | The service that manages customers. |
 | [\SumUp\Services\Merchant](https://github.com/sumup/sumup-ecom-php-sdk/blob/master/docs/reference/Merchant.md) | The service that manages merchant's profile. |
 | [\SumUp\Services\Payouts](https://github.com/sumup/sumup-ecom-php-sdk/blob/master/docs/reference/Payouts.md) | The service that manages payouts. |
+| [\SumUp\Services\Readers](https://github.com/sumup/sumup-ecom-php-sdk/blob/master/docs/reference/Readers.md) | The service that manages readers. |
 | [\SumUp\Services\Transactions](https://github.com/sumup/sumup-ecom-php-sdk/blob/master/docs/reference/Transactions.md) | The service that manages transactions. |
 
 <!-- ## HTTP Clients and Response

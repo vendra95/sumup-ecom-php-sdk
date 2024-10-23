@@ -90,7 +90,9 @@ class Readers implements SumUpService
             throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('pairing code'));
         }
         
-        $payload = [];
+        $payload = [
+            'pairing_code' => $pairingCode
+        ];
         
         if ($name !== null) {
             $payload['name'] = $name;
@@ -192,7 +194,7 @@ class Readers implements SumUpService
 
         $path = "/v0.1/merchants/{$merchantCode}/readers/{$idReader}";
         $headers = array_merge(Headers::getStandardHeaders(), Headers::getAuth($this->accessToken));
-        return $this->client->send('PUT', $path, $payload, $headers);
+        return $this->client->send('PATCH', $path, $payload, $headers);
     }
 
     /**
