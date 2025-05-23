@@ -44,6 +44,7 @@ class Transactions implements SumUpService
     /**
      * Get single transaction by transaction ID.
      *
+     * @param $merchantCode
      * @param $transactionId
      *
      * @return \SumUp\HttpClients\Response
@@ -54,12 +55,15 @@ class Transactions implements SumUpService
      * @throws \SumUp\Exceptions\SumUpAuthenticationException
      * @throws \SumUp\Exceptions\SumUpSDKException
      */
-    public function findById($transactionId)
+    public function findById($merchantCode, $transactionId)
     {
+        if (empty($merchantCode)) {
+            throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('merchant code'));
+        }
         if (empty($transactionId)) {
             throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('transaction id'));
         }
-        $path = '/v0.1/me/transactions?id=' . $transactionId;
+        $path = "/v2.1/merchants/{$merchantCode}/transactions?id=" . $transactionId;
         $headers = array_merge(Headers::getStandardHeaders(), Headers::getAuth($this->accessToken));
         return $this->client->send('GET', $path, [], $headers);
     }
@@ -67,7 +71,8 @@ class Transactions implements SumUpService
     /**
      * Get single transaction by internal ID.
      *
-     * @param $internalId
+     * @param string $merchantCode
+     * @param string $internalId
      *
      * @return \SumUp\HttpClients\Response
      *
@@ -77,12 +82,15 @@ class Transactions implements SumUpService
      * @throws \SumUp\Exceptions\SumUpAuthenticationException
      * @throws \SumUp\Exceptions\SumUpSDKException
      */
-    public function findByInternalId($internalId)
+    public function findByInternalId($merchantCode, $internalId)
     {
+        if (empty($merchantCode)) {
+            throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('merchant code'));
+        }
         if (empty($internalId)) {
             throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('internal id'));
         }
-        $path = '/v0.1/me/transactions?internal_id=' . $internalId;
+        $path = "/v2.1/merchants/{$merchantCode}/transactions?internal_id=" . $internalId;
         $headers = array_merge(Headers::getStandardHeaders(), Headers::getAuth($this->accessToken));
         return $this->client->send('GET', $path, [], $headers);
     }
@@ -90,7 +98,8 @@ class Transactions implements SumUpService
     /**
      * Get single transaction by foreign transaction id.
      *
-     * @param $foreignId
+     * @param string $merchantCode
+     * @param string $foreignId
      *
      * @return \SumUp\HttpClients\Response
      *
@@ -100,12 +109,15 @@ class Transactions implements SumUpService
      * @throws \SumUp\Exceptions\SumUpAuthenticationException
      * @throws \SumUp\Exceptions\SumUpSDKException
      */
-    public function findByForeignId($foreignId)
+    public function findByForeignId($merchantCode, $foreignId)
     {
+        if (empty($merchantCode)) {
+            throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('merchant code'));
+        }
         if (empty($foreignId)) {
             throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('foreign transaction id'));
         }
-        $path = '/v0.1/me/transactions?foreign_transaction_id=' . $foreignId;
+        $path = "/v2.1/merchants/{$merchantCode}/transactions?foreign_transaction_id=" . $foreignId;
         $headers = array_merge(Headers::getStandardHeaders(), Headers::getAuth($this->accessToken));
         return $this->client->send('GET', $path, [], $headers);
     }
@@ -113,7 +125,8 @@ class Transactions implements SumUpService
     /**
      * Get single transaction by transaction code.
      *
-     * @param $transactionCode
+     * @param string $merchantCode
+     * @param string $transactionCode
      *
      * @return \SumUp\HttpClients\Response
      *
@@ -123,12 +136,15 @@ class Transactions implements SumUpService
      * @throws \SumUp\Exceptions\SumUpAuthenticationException
      * @throws \SumUp\Exceptions\SumUpSDKException
      */
-    public function findByTransactionCode($transactionCode)
+    public function findByTransactionCode($merchantCode, $transactionCode)
     {
+        if (empty($merchantCode)) {
+            throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('merchant code'));
+        }
         if (empty($transactionCode)) {
             throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('transaction code'));
         }
-        $path = '/v0.1/me/transactions?transaction_code=' . $transactionCode;
+        $path = "/v2.1/merchants/{$merchantCode}/transactions?transaction_code=" . $transactionCode;
         $headers = array_merge(Headers::getStandardHeaders(), Headers::getAuth($this->accessToken));
         return $this->client->send('GET', $path, [], $headers);
     }
@@ -136,6 +152,7 @@ class Transactions implements SumUpService
     /**
      * Get a list of transactions.
      *
+     * @param string $merchantCode
      * @param array $filters
      *
      * @return \SumUp\HttpClients\Response
@@ -145,9 +162,13 @@ class Transactions implements SumUpService
      * @throws \SumUp\Exceptions\SumUpAuthenticationException
      * @throws \SumUp\Exceptions\SumUpSDKException
      */
-    public function getTransactionHistory($filters = [])
+    public function getTransactionHistory($merchantCode, $filters = [])
     {
+        if (empty($merchantCode)) {
+            throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('merchant code'));
+        }
         $filters = array_merge([
+            'transaction_code' => null,
             'order' => 'ascending',
             'limit' => 10,
             'user_id' => null,
@@ -161,14 +182,12 @@ class Transactions implements SumUpService
             'oldest_time' => null,
             'oldest_ref' => null,
         ], $filters);
-
         $queryParams = http_build_query($filters);
         /**
          * Remove index from the [] because the server doesn't support it this way.
          */
         $queryParams = preg_replace('/%5B[0-9]+%5D/', '%5B%5D', $queryParams);
-
-        $path = '/v0.1/me/transactions/history?' . $queryParams;
+        $path = "/v2.1/merchants/{$merchantCode}/transactions/history?" . $queryParams;
         $headers = array_merge(Headers::getStandardHeaders(), Headers::getAuth($this->accessToken));
         return $this->client->send('GET', $path, [], $headers);
     }

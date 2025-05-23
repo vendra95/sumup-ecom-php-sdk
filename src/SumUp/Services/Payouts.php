@@ -44,6 +44,7 @@ class Payouts implements SumUpService
     /**
      * Get a list of payouts.
      *
+     * @param string $merchantCode
      * @param string $startDate
      * @param string $endDate
      * @param int    $limit
@@ -58,8 +59,11 @@ class Payouts implements SumUpService
      * @throws \SumUp\Exceptions\SumUpAuthenticationException
      * @throws \SumUp\Exceptions\SumUpSDKException
      */
-    public function getPayouts($startDate, $endDate, $limit = 10, $descendingOrder = true, $format = 'json')
+    public function getPayouts($merchantCode, $startDate, $endDate, $limit = 10, $descendingOrder = true, $format = 'json')
     {
+        if (empty($merchantCode)) {
+            throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('merchant code'));
+        }
         if (empty($startDate)) {
             throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('start date'));
         }
@@ -83,7 +87,7 @@ class Payouts implements SumUpService
             'format' => $format
         ];
         $queryParams = http_build_query($filters);
-        $path = '/v0.1/me/financials/payouts?' . $queryParams;
+        $path = "/v1.0/merchants/{$merchantCode}/payouts?" . $queryParams;
         $headers = array_merge(Headers::getStandardHeaders(), Headers::getAuth($this->accessToken));
         return $this->client->send('GET', $path, null, $headers);
     }

@@ -89,11 +89,11 @@ class Readers implements SumUpService
         if (empty($pairingCode)) {
             throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('pairing code'));
         }
-        
+
         $payload = [
             'pairing_code' => $pairingCode
         ];
-        
+
         if ($name !== null) {
             $payload['name'] = $name;
         }
@@ -252,6 +252,49 @@ class Readers implements SumUpService
         }
 
         $path = "/v0.1/merchants/{$merchantCode}/readers/{$idReader}/checkout";
+        $headers = array_merge(Headers::getStandardHeaders(), Headers::getAuth($this->accessToken));
+        return $this->client->send('POST', $path, $payload, $headers);
+    }
+
+    /**
+     * Create a Terminate action for a Reader.
+
+     * It stops the current transaction on the target device.
+     * 
+     * This process is asynchronous and the actual termination may take some time to be performed on the device.
+     * 
+     * There are some caveats when using this endpoint:
+     * 
+     * The target device must be online, otherwise terminate won't be accepted
+     * The action will succeed only if the device is waiting for cardholder action: e.g: waiting for card, waiting for PIN, etc.
+     * There is no confirmation of the termination.
+     * If a transaction is successfully terminated and return_url was provided on Checkout, the transaction status will be sent as failed to the provided URL.
+     * 
+     * Note: If the target device is a Solo, it must be in version 3.3.28.0 or higher.
+     *
+     * @param string $merchantCode
+     * @param string $idReader
+     *
+     * @return \SumUp\HttpClients\Response
+     *
+     * @throws SumUpArgumentException
+     * @throws \SumUp\Exceptions\SumUpConnectionException
+     * @throws \SumUp\Exceptions\SumUpResponseException
+     * @throws \SumUp\Exceptions\SumUpAuthenticationException
+     * @throws \SumUp\Exceptions\SumUpSDKException
+     */
+
+    public function readerTerminate($merchantCode, $idReader) {
+        if (empty($merchantCode)) {
+            throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('merchant code'));
+        }
+        if (empty($idReader)) {
+            throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('id reader'));
+        }
+
+        $payload = [];
+
+        $path = "/v0.1/merchants/{$merchantCode}/readers/{$idReader}/terminate";
         $headers = array_merge(Headers::getStandardHeaders(), Headers::getAuth($this->accessToken));
         return $this->client->send('POST', $path, $payload, $headers);
     }
