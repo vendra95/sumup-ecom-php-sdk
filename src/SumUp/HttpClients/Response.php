@@ -121,6 +121,10 @@ class Response
             return $this->body->message;
         }
 
+        if (isset($this->body->errors)) {
+            return $this->body->errors->detail;
+        }
+
         if (isset($this->body->error_message)) {
             return $this->body->error_message;
         }
@@ -128,3 +132,4 @@ class Response
         return $defaultMessage;
     }
 }
+ 
