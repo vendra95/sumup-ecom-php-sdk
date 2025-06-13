@@ -109,8 +109,7 @@ class Transactions implements SumUpService
      * @throws \SumUp\Exceptions\SumUpAuthenticationException
      * @throws \SumUp\Exceptions\SumUpSDKException
      */
-    public function findByForeignId($merchantCode, $foreignId)
-    {
+    public function findByForeignId($merchantCode, $foreignId) {
         if (empty($merchantCode)) {
             throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('merchant code'));
         }
@@ -118,6 +117,32 @@ class Transactions implements SumUpService
             throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('foreign transaction id'));
         }
         $path = "/v2.1/merchants/{$merchantCode}/transactions?foreign_transaction_id=" . $foreignId;
+        $headers = array_merge(Headers::getStandardHeaders(), Headers::getAuth($this->accessToken));
+        return $this->client->send('GET', $path, [], $headers);
+    }
+
+    /**
+     * Get single transaction by client transaction id.
+     *
+     * @param string $merchantCode
+     * @param string $clientId
+     *
+     * @return \SumUp\HttpClients\Response
+     *
+     * @throws SumUpArgumentException
+     * @throws \SumUp\Exceptions\SumUpConnectionException
+     * @throws \SumUp\Exceptions\SumUpResponseException
+     * @throws \SumUp\Exceptions\SumUpAuthenticationException
+     * @throws \SumUp\Exceptions\SumUpSDKException
+     */
+    public function findByClientId($merchantCode, $clientId) {
+        if (empty($merchantCode)) {
+            throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('merchant code'));
+        }
+        if (empty($clientId)) {
+            throw new SumUpArgumentException(ExceptionMessages::getMissingParamMsg('client transaction id'));
+        }
+        $path = "/v2.1/merchants/{$merchantCode}/transactions?client_transaction_id=" . $clientId;
         $headers = array_merge(Headers::getStandardHeaders(), Headers::getAuth($this->accessToken));
         return $this->client->send('GET', $path, [], $headers);
     }
