@@ -3,6 +3,7 @@
 namespace SumUp\HttpClients;
 
 use SumUp\Exceptions\SumUpAuthenticationException;
+use SumUp\Exceptions\SumUpReaderException;
 use SumUp\Exceptions\SumUpResponseException;
 use SumUp\Exceptions\SumUpServerException;
 use SumUp\Exceptions\SumUpValidationException;
@@ -38,7 +39,7 @@ class Response
      * @throws SumUpResponseException
      * @throws SumUpValidationException
      * @throws SumUpServerException
-     * @throws \SumUp\Exceptions\SumUpSDKException
+     * @throws SumUpSDKException
      * @throws SumUpValidationException
      */
     public function __construct($httpResponseCode, $body)
@@ -77,15 +78,23 @@ class Response
      * @throws SumUpResponseException
      * @throws SumUpValidationException
      * @throws SumUpServerException
-     * @throws \SumUp\Exceptions\SumUpSDKException
+     * @throws SumUpReaderException
+     * @throws SumUpSDKException
      */
     protected function parseResponseForErrors()
     {
-        if (isset($this->body->error_code) && $this->body->error_code === 'NOT_AUTHORIZED') {
-            throw new SumUpAuthenticationException($this->body->error_message, $this->httpResponseCode);
+        if (isset($this->body->code) && $this->body->code === 'unauthorized') {
+            throw new SumUpAuthenticationException($this->body->message, $this->httpResponseCode);
         }
-        if (isset($this->body->error_code) && ($this->body->error_code === 'MISSING' || $this->body->error_code === 'INVALID')) {
-            throw new SumUpValidationException([$this->body->param], $this->httpResponseCode);
+        if (isset($this->body->error) && ($this->body->error  === 'MISSING' || $this->body->error  === 'invalid_grant')) {
+            throw new SumUpValidationException([$this->body->error_description], $this->httpResponseCode);
+        }
+        if (isset($this->body->errors)) {
+            if (isset($this->body->errors->type) && ($this->body->errors->type  === 'READER_OFFLINE')) {
+                throw new SumUpReaderException($this->body->errors->detail, $this->httpResponseCode, $this->body->errors->type);
+            } else {
+                throw new SumUpReaderException($this->body->errors->detail, $this->httpResponseCode, 'READER_BUSY');
+            }
         }
         if (is_array($this->body) && sizeof($this->body) > 0 && isset($this->body[0]->error_code) && ($this->body[0]->error_code === 'MISSING' || $this->body[0]->error_code === 'INVALID')) {
             $invalidFields = [];
@@ -132,4 +141,3 @@ class Response
         return $defaultMessage;
     }
 }
- 
